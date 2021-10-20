@@ -1,0 +1,102 @@
+$for(i in range(8))	$for(pair in [_.split() for _ in 'cneqsn t1sn,ceqsn t0sn'.split(',')] )
+replace restart {
+	mov.io a, __pa
+	and a, #0x$('{:02x}'.format(1<<i))
+	$(pair[0]) a, #0x00
+	goto %1
+} by {; peephole $(pair[1]) PA$(i) check optimization
+	$(pair[1])	__pa, #$(i)
+	goto	%1
+}
+$endfor	$endfor
+
+$for(pair in [_.split() for _ in 't0sn t1sn,t1sn t0sn'.split(',')] )
+replace restart {
+%1:
+	$(pair[0])	%3,%4
+	goto	%2
+	goto	%1
+%2:
+} by {
+%1:
+	$(pair[1])	%3,%4
+	goto	%1
+%2:
+	; peephole $(pair[0]) -> $(pair[1])
+}
+$endfor
+
+replace restart {
+	goto	%1
+%1:
+} by {
+	; peephole jmp +1.
+}
+
+replace restart {
+	goto	%1
+%1:
+} by {
+	; peephole jmp +1.
+}
+
+$for(i in range(8)) $for(inst in 't0sn t1sn'.split() )
+replace restart {
+	$(inst).io	f, %4
+	goto	%2
+	mov.io	%1, %5
+	or		%1, #0x$('{:02x}'.format(1<<i))
+	goto	%3
+%2:
+	mov.io	%1, %5
+	and		%1, #0x$('{:02x}'.format(~(1<<i)&0xff))
+%3:
+	mov.io	%5, %1
+} by {; peephole $(inst) bit set/clear
+	$(inst).io	f, %4
+	goto	%2
+	set1.io	%5, #$(i)
+	goto	%3
+%2:
+	set0.io	%5, #$(i)
+%3:
+}
+$py('''
+}if notUsed('a')	//--FIXME:
+}if notUsed(%1)		//--FIXME:
+''')\
+$endfor $endfor\
+
+replace restart {
+	call	%1
+	mov		%2, a
+	call	%3
+	mov		%4, a
+	mov		a, %2
+	sub		a, %5
+	mov		a, %4
+	subc	a, %6
+} by {	; peephole const sub16
+	call	%1
+	sub		a, %5
+	call	%3
+	subc	a, %6
+}//if notUsed(%2)
+
+$py('''
+replace restart {
+	call	%1+0
+	mov		%2+0, a
+	call	%1+1
+	mov		%2+1, a
+	mov		a, %2+0
+	sub		a, %3+0
+	mov		a, %2+1
+	subc	a, %3+1
+} by {	; peephole const sub16
+	call	%1+0
+	sub		a, %3+0
+	call	%1+1
+	subc	a, %3+1
+}//if notUsed(%2)
+''')\
