@@ -9,6 +9,7 @@ CFLAGS+= --peep-asm --peep-return --peep-file ../$(PEEPFILE)
 
 OBJDIR=build
 
+#pip install pyexpander intelhex
 expander=$(PYSCRIPTS)expander.py
 
 PHONY:info
