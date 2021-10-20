@@ -1,10 +1,11 @@
+//	PDK13 peephole rules
 	
 replace restart {
 	mov.io a, __pa
 	and a, #0x01
 	cneqsn a, #0x00
 	goto %1
-} by {; peephole t1sn PA0 check optimization
+} by {	; peephole ( t1sn PA0 check )
 	t1sn	__pa, #0
 	goto	%1
 }
@@ -14,7 +15,7 @@ replace restart {
 	and a, #0x01
 	ceqsn a, #0x00
 	goto %1
-} by {; peephole t0sn PA0 check optimization
+} by {	; peephole ( t0sn PA0 check )
 	t0sn	__pa, #0
 	goto	%1
 }
@@ -24,7 +25,7 @@ replace restart {
 	and a, #0x02
 	cneqsn a, #0x00
 	goto %1
-} by {; peephole t1sn PA1 check optimization
+} by {	; peephole ( t1sn PA1 check )
 	t1sn	__pa, #1
 	goto	%1
 }
@@ -34,7 +35,7 @@ replace restart {
 	and a, #0x02
 	ceqsn a, #0x00
 	goto %1
-} by {; peephole t0sn PA1 check optimization
+} by {	; peephole ( t0sn PA1 check )
 	t0sn	__pa, #1
 	goto	%1
 }
@@ -44,7 +45,7 @@ replace restart {
 	and a, #0x04
 	cneqsn a, #0x00
 	goto %1
-} by {; peephole t1sn PA2 check optimization
+} by {	; peephole ( t1sn PA2 check )
 	t1sn	__pa, #2
 	goto	%1
 }
@@ -54,7 +55,7 @@ replace restart {
 	and a, #0x04
 	ceqsn a, #0x00
 	goto %1
-} by {; peephole t0sn PA2 check optimization
+} by {	; peephole ( t0sn PA2 check )
 	t0sn	__pa, #2
 	goto	%1
 }
@@ -64,7 +65,7 @@ replace restart {
 	and a, #0x08
 	cneqsn a, #0x00
 	goto %1
-} by {; peephole t1sn PA3 check optimization
+} by {	; peephole ( t1sn PA3 check )
 	t1sn	__pa, #3
 	goto	%1
 }
@@ -74,7 +75,7 @@ replace restart {
 	and a, #0x08
 	ceqsn a, #0x00
 	goto %1
-} by {; peephole t0sn PA3 check optimization
+} by {	; peephole ( t0sn PA3 check )
 	t0sn	__pa, #3
 	goto	%1
 }
@@ -84,7 +85,7 @@ replace restart {
 	and a, #0x10
 	cneqsn a, #0x00
 	goto %1
-} by {; peephole t1sn PA4 check optimization
+} by {	; peephole ( t1sn PA4 check )
 	t1sn	__pa, #4
 	goto	%1
 }
@@ -94,7 +95,7 @@ replace restart {
 	and a, #0x10
 	ceqsn a, #0x00
 	goto %1
-} by {; peephole t0sn PA4 check optimization
+} by {	; peephole ( t0sn PA4 check )
 	t0sn	__pa, #4
 	goto	%1
 }
@@ -104,7 +105,7 @@ replace restart {
 	and a, #0x20
 	cneqsn a, #0x00
 	goto %1
-} by {; peephole t1sn PA5 check optimization
+} by {	; peephole ( t1sn PA5 check )
 	t1sn	__pa, #5
 	goto	%1
 }
@@ -114,7 +115,7 @@ replace restart {
 	and a, #0x20
 	ceqsn a, #0x00
 	goto %1
-} by {; peephole t0sn PA5 check optimization
+} by {	; peephole ( t0sn PA5 check )
 	t0sn	__pa, #5
 	goto	%1
 }
@@ -124,7 +125,7 @@ replace restart {
 	and a, #0x40
 	cneqsn a, #0x00
 	goto %1
-} by {; peephole t1sn PA6 check optimization
+} by {	; peephole ( t1sn PA6 check )
 	t1sn	__pa, #6
 	goto	%1
 }
@@ -134,7 +135,7 @@ replace restart {
 	and a, #0x40
 	ceqsn a, #0x00
 	goto %1
-} by {; peephole t0sn PA6 check optimization
+} by {	; peephole ( t0sn PA6 check )
 	t0sn	__pa, #6
 	goto	%1
 }
@@ -144,7 +145,7 @@ replace restart {
 	and a, #0x80
 	cneqsn a, #0x00
 	goto %1
-} by {; peephole t1sn PA7 check optimization
+} by {	; peephole ( t1sn PA7 check )
 	t1sn	__pa, #7
 	goto	%1
 }
@@ -154,25 +155,35 @@ replace restart {
 	and a, #0x80
 	ceqsn a, #0x00
 	goto %1
-} by {; peephole t0sn PA7 check optimization
+} by {	; peephole ( t0sn PA7 check )
 	t0sn	__pa, #7
 	goto	%1
 }
 	
-
+//	----	conditional jumps	-----------------------------------------------
 
 replace restart {
 %1:
 	t0sn	%3,%4
 	goto	%2
 	goto	%1
-%2:
-} by {
+} by {	; peephole ( untwist conditional jumps t0sn -> t1sn )
 %1:
 	t1sn	%3,%4
 	goto	%1
+	goto	%2
+}
+
+replace restart {
+	t0sn	%3,%4
+	goto	%2
+	goto	%1
 %2:
-	; peephole t0sn -> t1sn
+} by {	; peephole ( untwist conditional jumps t0sn -> t1sn )
+	t1sn	%3,%4
+	goto	%1
+	goto	%2
+%2:
 }
 
 replace restart {
@@ -180,30 +191,26 @@ replace restart {
 	t1sn	%3,%4
 	goto	%2
 	goto	%1
-%2:
-} by {
+} by {	; peephole ( untwist conditional jumps t1sn -> t0sn )
 %1:
 	t0sn	%3,%4
 	goto	%1
+	goto	%2
+}
+
+replace restart {
+	t1sn	%3,%4
+	goto	%2
+	goto	%1
 %2:
-	; peephole t1sn -> t0sn
-}
-
-
-replace restart {
+} by {	; peephole ( untwist conditional jumps t1sn -> t0sn )
+	t0sn	%3,%4
 	goto	%1
-%1:
-} by {
-	; peephole jmp +1.
+	goto	%2
+%2:
 }
 
-replace restart {
-	goto	%1
-%1:
-} by {
-	; peephole jmp +1.
-}
-
+//	----	bit movements	-----------------------------------------------
  
 replace restart {
 	t0sn.io	f, %4
@@ -216,7 +223,7 @@ replace restart {
 	and		%1, #0xfe
 %3:
 	mov.io	%5, %1
-} by {; peephole t0sn bit set/clear
+} by {	; peephole ( t0sn bit set/clear )
 	t0sn.io	f, %4
 	goto	%2
 	set1.io	%5, #0
@@ -237,7 +244,7 @@ replace restart {
 	and		%1, #0xfe
 %3:
 	mov.io	%5, %1
-} by {; peephole t1sn bit set/clear
+} by {	; peephole ( t1sn bit set/clear )
 	t1sn.io	f, %4
 	goto	%2
 	set1.io	%5, #0
@@ -258,7 +265,7 @@ replace restart {
 	and		%1, #0xfd
 %3:
 	mov.io	%5, %1
-} by {; peephole t0sn bit set/clear
+} by {	; peephole ( t0sn bit set/clear )
 	t0sn.io	f, %4
 	goto	%2
 	set1.io	%5, #1
@@ -279,7 +286,7 @@ replace restart {
 	and		%1, #0xfd
 %3:
 	mov.io	%5, %1
-} by {; peephole t1sn bit set/clear
+} by {	; peephole ( t1sn bit set/clear )
 	t1sn.io	f, %4
 	goto	%2
 	set1.io	%5, #1
@@ -300,7 +307,7 @@ replace restart {
 	and		%1, #0xfb
 %3:
 	mov.io	%5, %1
-} by {; peephole t0sn bit set/clear
+} by {	; peephole ( t0sn bit set/clear )
 	t0sn.io	f, %4
 	goto	%2
 	set1.io	%5, #2
@@ -321,7 +328,7 @@ replace restart {
 	and		%1, #0xfb
 %3:
 	mov.io	%5, %1
-} by {; peephole t1sn bit set/clear
+} by {	; peephole ( t1sn bit set/clear )
 	t1sn.io	f, %4
 	goto	%2
 	set1.io	%5, #2
@@ -342,7 +349,7 @@ replace restart {
 	and		%1, #0xf7
 %3:
 	mov.io	%5, %1
-} by {; peephole t0sn bit set/clear
+} by {	; peephole ( t0sn bit set/clear )
 	t0sn.io	f, %4
 	goto	%2
 	set1.io	%5, #3
@@ -363,7 +370,7 @@ replace restart {
 	and		%1, #0xf7
 %3:
 	mov.io	%5, %1
-} by {; peephole t1sn bit set/clear
+} by {	; peephole ( t1sn bit set/clear )
 	t1sn.io	f, %4
 	goto	%2
 	set1.io	%5, #3
@@ -384,7 +391,7 @@ replace restart {
 	and		%1, #0xef
 %3:
 	mov.io	%5, %1
-} by {; peephole t0sn bit set/clear
+} by {	; peephole ( t0sn bit set/clear )
 	t0sn.io	f, %4
 	goto	%2
 	set1.io	%5, #4
@@ -405,7 +412,7 @@ replace restart {
 	and		%1, #0xef
 %3:
 	mov.io	%5, %1
-} by {; peephole t1sn bit set/clear
+} by {	; peephole ( t1sn bit set/clear )
 	t1sn.io	f, %4
 	goto	%2
 	set1.io	%5, #4
@@ -426,7 +433,7 @@ replace restart {
 	and		%1, #0xdf
 %3:
 	mov.io	%5, %1
-} by {; peephole t0sn bit set/clear
+} by {	; peephole ( t0sn bit set/clear )
 	t0sn.io	f, %4
 	goto	%2
 	set1.io	%5, #5
@@ -447,7 +454,7 @@ replace restart {
 	and		%1, #0xdf
 %3:
 	mov.io	%5, %1
-} by {; peephole t1sn bit set/clear
+} by {	; peephole ( t1sn bit set/clear )
 	t1sn.io	f, %4
 	goto	%2
 	set1.io	%5, #5
@@ -468,7 +475,7 @@ replace restart {
 	and		%1, #0xbf
 %3:
 	mov.io	%5, %1
-} by {; peephole t0sn bit set/clear
+} by {	; peephole ( t0sn bit set/clear )
 	t0sn.io	f, %4
 	goto	%2
 	set1.io	%5, #6
@@ -489,7 +496,7 @@ replace restart {
 	and		%1, #0xbf
 %3:
 	mov.io	%5, %1
-} by {; peephole t1sn bit set/clear
+} by {	; peephole ( t1sn bit set/clear )
 	t1sn.io	f, %4
 	goto	%2
 	set1.io	%5, #6
@@ -510,7 +517,7 @@ replace restart {
 	and		%1, #0x7f
 %3:
 	mov.io	%5, %1
-} by {; peephole t0sn bit set/clear
+} by {	; peephole ( t0sn bit set/clear )
 	t0sn.io	f, %4
 	goto	%2
 	set1.io	%5, #7
@@ -531,7 +538,7 @@ replace restart {
 	and		%1, #0x7f
 %3:
 	mov.io	%5, %1
-} by {; peephole t1sn bit set/clear
+} by {	; peephole ( t1sn bit set/clear )
 	t1sn.io	f, %4
 	goto	%2
 	set1.io	%5, #7
@@ -541,6 +548,416 @@ replace restart {
 %3:
 }
  
+//	----	bit ops	-----------------------------------------------------------
+	
+replace restart {
+	mov		a, %2
+	and		a, #0x01
+	ceqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait 0 )
+	t0sn	%2, #0
+	goto	%1
+}
+
+replace restart {
+	mov		a, %2
+	and		a, #0x01
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait 1 ) FIXME: should be used "cneqsn" instead
+	t1sn	%2, #0
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov.io	a, %2
+	and		a, #0x01
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait io 1 ) FIXME: should be used "cneqsn" instead
+	t1sn.io	%2, #0
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov		a, #0xfe
+	and		%1, a
+} by {; peephole ( and -> set0 )
+	set0	%1, #0
+}if notUsed('a')
+
+replace restart {
+	mov		a, #0x01
+	or		%1, a
+} by {; peephole ( or -> set1 )
+	set1	%1, #0
+}if notUsed('a')
+	
+replace restart {
+	mov		a, %2
+	and		a, #0x02
+	ceqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait 0 )
+	t0sn	%2, #1
+	goto	%1
+}
+
+replace restart {
+	mov		a, %2
+	and		a, #0x02
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait 1 ) FIXME: should be used "cneqsn" instead
+	t1sn	%2, #1
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov.io	a, %2
+	and		a, #0x02
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait io 1 ) FIXME: should be used "cneqsn" instead
+	t1sn.io	%2, #1
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov		a, #0xfd
+	and		%1, a
+} by {; peephole ( and -> set0 )
+	set0	%1, #1
+}if notUsed('a')
+
+replace restart {
+	mov		a, #0x02
+	or		%1, a
+} by {; peephole ( or -> set1 )
+	set1	%1, #1
+}if notUsed('a')
+	
+replace restart {
+	mov		a, %2
+	and		a, #0x04
+	ceqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait 0 )
+	t0sn	%2, #2
+	goto	%1
+}
+
+replace restart {
+	mov		a, %2
+	and		a, #0x04
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait 1 ) FIXME: should be used "cneqsn" instead
+	t1sn	%2, #2
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov.io	a, %2
+	and		a, #0x04
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait io 1 ) FIXME: should be used "cneqsn" instead
+	t1sn.io	%2, #2
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov		a, #0xfb
+	and		%1, a
+} by {; peephole ( and -> set0 )
+	set0	%1, #2
+}if notUsed('a')
+
+replace restart {
+	mov		a, #0x04
+	or		%1, a
+} by {; peephole ( or -> set1 )
+	set1	%1, #2
+}if notUsed('a')
+	
+replace restart {
+	mov		a, %2
+	and		a, #0x08
+	ceqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait 0 )
+	t0sn	%2, #3
+	goto	%1
+}
+
+replace restart {
+	mov		a, %2
+	and		a, #0x08
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait 1 ) FIXME: should be used "cneqsn" instead
+	t1sn	%2, #3
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov.io	a, %2
+	and		a, #0x08
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait io 1 ) FIXME: should be used "cneqsn" instead
+	t1sn.io	%2, #3
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov		a, #0xf7
+	and		%1, a
+} by {; peephole ( and -> set0 )
+	set0	%1, #3
+}if notUsed('a')
+
+replace restart {
+	mov		a, #0x08
+	or		%1, a
+} by {; peephole ( or -> set1 )
+	set1	%1, #3
+}if notUsed('a')
+	
+replace restart {
+	mov		a, %2
+	and		a, #0x10
+	ceqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait 0 )
+	t0sn	%2, #4
+	goto	%1
+}
+
+replace restart {
+	mov		a, %2
+	and		a, #0x10
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait 1 ) FIXME: should be used "cneqsn" instead
+	t1sn	%2, #4
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov.io	a, %2
+	and		a, #0x10
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait io 1 ) FIXME: should be used "cneqsn" instead
+	t1sn.io	%2, #4
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov		a, #0xef
+	and		%1, a
+} by {; peephole ( and -> set0 )
+	set0	%1, #4
+}if notUsed('a')
+
+replace restart {
+	mov		a, #0x10
+	or		%1, a
+} by {; peephole ( or -> set1 )
+	set1	%1, #4
+}if notUsed('a')
+	
+replace restart {
+	mov		a, %2
+	and		a, #0x20
+	ceqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait 0 )
+	t0sn	%2, #5
+	goto	%1
+}
+
+replace restart {
+	mov		a, %2
+	and		a, #0x20
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait 1 ) FIXME: should be used "cneqsn" instead
+	t1sn	%2, #5
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov.io	a, %2
+	and		a, #0x20
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait io 1 ) FIXME: should be used "cneqsn" instead
+	t1sn.io	%2, #5
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov		a, #0xdf
+	and		%1, a
+} by {; peephole ( and -> set0 )
+	set0	%1, #5
+}if notUsed('a')
+
+replace restart {
+	mov		a, #0x20
+	or		%1, a
+} by {; peephole ( or -> set1 )
+	set1	%1, #5
+}if notUsed('a')
+	
+replace restart {
+	mov		a, %2
+	and		a, #0x40
+	ceqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait 0 )
+	t0sn	%2, #6
+	goto	%1
+}
+
+replace restart {
+	mov		a, %2
+	and		a, #0x40
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait 1 ) FIXME: should be used "cneqsn" instead
+	t1sn	%2, #6
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov.io	a, %2
+	and		a, #0x40
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait io 1 ) FIXME: should be used "cneqsn" instead
+	t1sn.io	%2, #6
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov		a, #0xbf
+	and		%1, a
+} by {; peephole ( and -> set0 )
+	set0	%1, #6
+}if notUsed('a')
+
+replace restart {
+	mov		a, #0x40
+	or		%1, a
+} by {; peephole ( or -> set1 )
+	set1	%1, #6
+}if notUsed('a')
+	
+replace restart {
+	mov		a, %2
+	and		a, #0x80
+	ceqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait 0 )
+	t0sn	%2, #7
+	goto	%1
+}
+
+replace restart {
+	mov		a, %2
+	and		a, #0x80
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait 1 ) FIXME: should be used "cneqsn" instead
+	t1sn	%2, #7
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov.io	a, %2
+	and		a, #0x80
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait io 1 ) FIXME: should be used "cneqsn" instead
+	t1sn.io	%2, #7
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov		a, #0x7f
+	and		%1, a
+} by {; peephole ( and -> set0 )
+	set0	%1, #7
+}if notUsed('a')
+
+replace restart {
+	mov		a, #0x80
+	or		%1, a
+} by {; peephole ( or -> set1 )
+	set1	%1, #7
+}if notUsed('a')
+
+//	----	misc	-----------------------------------------------------------
+replace restart {
+	goto	%1
+%1:
+} by {	; peephole ( jmp +1 )
+%1:
+}
+
 replace restart {
 	call	%1
 	mov		%2, a
@@ -550,10 +967,11 @@ replace restart {
 	sub		a, %5
 	mov		a, %4
 	subc	a, %6
-} by {	; peephole const sub16
+} by {	; peephole ( const sub16 )
 	call	%1
 	sub		a, %5
 	call	%3
 	subc	a, %6
 }//if notUsed(%2)
 
+//-----------------------------------------------------------------------------

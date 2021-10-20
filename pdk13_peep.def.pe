@@ -1,58 +1,65 @@
+//	PDK13 peephole rules
+$py(
+#	$(PEEPFILE):$(PEEPFILE).pe
+#		Python\Scripts\expander.py -f $< > $@
+#	tabs=4
+
+def msk(i):		return f'#0x{1<<i:02x}'		#'#0x{:02x}'.format(1<<i)
+def imsk(i):	return f'#0x{~(1<<i)&0xff:02x}'
+)$extend(msk,imsk)\
 $for(i in range(8))	$for(pair in [_.split() for _ in 'cneqsn t1sn,ceqsn t0sn'.split(',')] )
 replace restart {
 	mov.io a, __pa
-	and a, #0x$('{:02x}'.format(1<<i))
+	and a, $msk(i)
 	$(pair[0]) a, #0x00
 	goto %1
-} by {; peephole $(pair[1]) PA$(i) check optimization
+} by {	; peephole ( $(pair[1]) PA$(i) check )
 	$(pair[1])	__pa, #$(i)
 	goto	%1
 }
-$endfor	$endfor
+$endfor	$endfor\
 
+//	----	conditional jumps	-----------------------------------------------
 $for(pair in [_.split() for _ in 't0sn t1sn,t1sn t0sn'.split(',')] )
 replace restart {
 %1:
 	$(pair[0])	%3,%4
 	goto	%2
 	goto	%1
-%2:
-} by {
+} by {	; peephole ( untwist conditional jumps $(pair[0]) -> $(pair[1]) )
 %1:
 	$(pair[1])	%3,%4
 	goto	%1
+	goto	%2
+}
+
+replace restart {
+	$(pair[0])	%3,%4
+	goto	%2
+	goto	%1
 %2:
-	; peephole $(pair[0]) -> $(pair[1])
-}
-$endfor
-
-replace restart {
+} by {	; peephole ( untwist conditional jumps $(pair[0]) -> $(pair[1]) )
+	$(pair[1])	%3,%4
 	goto	%1
-%1:
-} by {
-	; peephole jmp +1.
+	goto	%2
+%2:
 }
+$endfor\
 
-replace restart {
-	goto	%1
-%1:
-} by {
-	; peephole jmp +1.
-}
-
+//	----	bit movements	-----------------------------------------------
 $for(i in range(8)) $for(inst in 't0sn t1sn'.split() )
 replace restart {
 	$(inst).io	f, %4
 	goto	%2
 	mov.io	%1, %5
-	or		%1, #0x$('{:02x}'.format(1<<i))
+	or		%1, $msk(i)
 	goto	%3
 %2:
 	mov.io	%1, %5
-	and		%1, #0x$('{:02x}'.format(~(1<<i)&0xff))
+	and		%1, $imsk(i)
 %3:
 	mov.io	%5, %1
-} by {; peephole $(inst) bit set/clear
+} by {	; peephole ( $(inst) bit set/clear )
 	$(inst).io	f, %4
 	goto	%2
 	set1.io	%5, #$(i)
@@ -67,6 +74,67 @@ $py('''
 ''')\
 $endfor $endfor\
 
+//	----	bit ops	-----------------------------------------------------------
+$for(i in range(8))	
+replace restart {
+	mov		a, %2
+	and		a, $msk(i)
+	ceqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait 0 )
+	t0sn	%2, #$(i)
+	goto	%1
+}
+
+replace restart {
+	mov		a, %2
+	and		a, $msk(i)
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait 1 ) FIXME: should be used "cneqsn" instead
+	t1sn	%2, #$(i)
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov.io	a, %2
+	and		a, $msk(i)
+	ceqsn	a, #0x00
+	goto	%3
+	goto	%1
+%3:
+} by {	; peephole ( bit-wait io 1 ) FIXME: should be used "cneqsn" instead
+	t1sn.io	%2, #$(i)
+	goto	%1
+%3:
+}
+
+replace restart {
+	mov		a, $imsk(i)
+	and		%1, a
+} by {; peephole ( and -> set0 )
+	set0	%1, #$(i)
+}if notUsed('a')
+
+replace restart {
+	mov		a, $msk(i)
+	or		%1, a
+} by {; peephole ( or -> set1 )
+	set1	%1, #$(i)
+}if notUsed('a')
+$endfor\
+
+//	----	misc	-----------------------------------------------------------
+replace restart {
+	goto	%1
+%1:
+} by {	; peephole ( jmp +1 )
+%1:
+}
+
 replace restart {
 	call	%1
 	mov		%2, a
@@ -76,14 +144,15 @@ replace restart {
 	sub		a, %5
 	mov		a, %4
 	subc	a, %6
-} by {	; peephole const sub16
+} by {	; peephole ( const sub16 )
 	call	%1
 	sub		a, %5
 	call	%3
 	subc	a, %6
 }//if notUsed(%2)
 
-$py('''
+//-----------------------------------------------------------------------------
+$py('''		------------ scratch -----------
 replace restart {
 	call	%1+0
 	mov		%2+0, a
@@ -93,7 +162,7 @@ replace restart {
 	sub		a, %3+0
 	mov		a, %2+1
 	subc	a, %3+1
-} by {	; peephole const sub16
+} by {	; peephole ( const sub16 )
 	call	%1+0
 	sub		a, %3+0
 	call	%1+1
