@@ -158,9 +158,9 @@
       000000                        158 00120$:
                                     159 ;	../tb/test.c: 16: if get(PA,0) {
                                     160 ; genAnd
-                                    161 ; peephole ( t0sn PA0 check )
-                                    162 ; peephole ( untwist conditional jumps t0sn -> t1sn )
-      000000 10 02                  163 	t1sn	__pa,#0
+                                    161 ; peephole ( bit-wait.io 0 )
+                                    162 ; peephole ( untwist conditional jumps forward t0sn -> t1sn )
+      000000 10 0D                  163 	t1sn.io	__pa,#0
       000002r08r18                  164 	goto	00102$
                                     165 ; peephole ( jmp +1 )
       000004                        166 00160$:
@@ -179,17 +179,17 @@
                                     179 ; genLabel
       00000A                        180 00104$:
                                     181 ; genAnd
-                                    182 ; peephole ( t0sn PA1 check )
-      00000A 20 02                  183 	t0sn	__pa, #1
+                                    182 ; peephole ( bit-wait.io 0 )
+      00000A 30 0C                  183 	t0sn.io	__pa, #1
       00000Cr0Ar18                  184 	goto	00104$
                                     185 ; skipping generated iCode
                                     186 ;	../tb/test.c: 23: while ( get(PA,2) ) cnt++;
                                     187 ; genLabel
       00000E                        188 00107$:
                                     189 ; genAnd
-                                    190 ; peephole ( t0sn PA2 check )
-                                    191 ; peephole ( untwist conditional jumps t0sn -> t1sn )
-      00000E 50 02                  192 	t1sn	__pa,#2
+                                    190 ; peephole ( bit-wait.io 0 )
+                                    191 ; peephole ( untwist conditional jumps forward t0sn -> t1sn )
+      00000E 50 0D                  192 	t1sn.io	__pa,#2
       000010r18r18                  193 	goto	00110$
                                     194 ; peephole ( jmp +1 )
       000012                        195 00161$:
@@ -208,8 +208,8 @@
       00001Ar01r08                  208 	addc	_cnt+1
                                     209 ;	../tb/test.c: 26: while ( get(PA,3) );
                                     210 ; genAnd
-                                    211 ; peephole ( t0sn PA3 check )
-      00001C 60 02                  212 	t0sn	__pa, #3
+                                    211 ; peephole ( bit-wait.io 0 )
+      00001C 70 0C                  212 	t0sn.io	__pa, #3
       00001Er18r18                  213 	goto	00110$
                                     214 ; skipping generated iCode
                                     215 ;	../tb/test.c: 27: do 
@@ -221,9 +221,9 @@
       000022r01r08                  221 	addc	_cnt+1
                                     222 ;	../tb/test.c: 29: while ( !get(PA,3) );
                                     223 ; genAnd
-                                    224 ; peephole ( t0sn PA3 check )
-                                    225 ; peephole ( untwist conditional jumps t0sn -> t1sn )
-      000024 70 02                  226 	t1sn	__pa,#3
+                                    224 ; peephole ( bit-wait.io 0 )
+                                    225 ; peephole ( untwist conditional jumps forward t0sn -> t1sn )
+      000024 70 0D                  226 	t1sn.io	__pa,#3
       000026r20r18                  227 	goto	00113$
                                     228 ; peephole ( jmp +1 )
       000028                        229 00162$:

@@ -158,9 +158,9 @@ _main:
 00120$:
 ;	../tb/test.c: 16: if get(PA,0) {
 ; genAnd
-; peephole ( t0sn PA0 check )
-; peephole ( untwist conditional jumps t0sn -> t1sn )
-	t1sn	__pa,#0
+; peephole ( bit-wait.io 0 )
+; peephole ( untwist conditional jumps forward t0sn -> t1sn )
+	t1sn.io	__pa,#0
 	goto	00102$
 ; peephole ( jmp +1 )
 00160$:
@@ -179,17 +179,17 @@ _main:
 ; genLabel
 00104$:
 ; genAnd
-; peephole ( t0sn PA1 check )
-	t0sn	__pa, #1
+; peephole ( bit-wait.io 0 )
+	t0sn.io	__pa, #1
 	goto	00104$
 ; skipping generated iCode
 ;	../tb/test.c: 23: while ( get(PA,2) ) cnt++;
 ; genLabel
 00107$:
 ; genAnd
-; peephole ( t0sn PA2 check )
-; peephole ( untwist conditional jumps t0sn -> t1sn )
-	t1sn	__pa,#2
+; peephole ( bit-wait.io 0 )
+; peephole ( untwist conditional jumps forward t0sn -> t1sn )
+	t1sn.io	__pa,#2
 	goto	00110$
 ; peephole ( jmp +1 )
 00161$:
@@ -208,8 +208,8 @@ _main:
 	addc	_cnt+1
 ;	../tb/test.c: 26: while ( get(PA,3) );
 ; genAnd
-; peephole ( t0sn PA3 check )
-	t0sn	__pa, #3
+; peephole ( bit-wait.io 0 )
+	t0sn.io	__pa, #3
 	goto	00110$
 ; skipping generated iCode
 ;	../tb/test.c: 27: do 
@@ -221,9 +221,9 @@ _main:
 	addc	_cnt+1
 ;	../tb/test.c: 29: while ( !get(PA,3) );
 ; genAnd
-; peephole ( t0sn PA3 check )
-; peephole ( untwist conditional jumps t0sn -> t1sn )
-	t1sn	__pa,#3
+; peephole ( bit-wait.io 0 )
+; peephole ( untwist conditional jumps forward t0sn -> t1sn )
+	t1sn.io	__pa,#3
 	goto	00113$
 ; peephole ( jmp +1 )
 00162$:
