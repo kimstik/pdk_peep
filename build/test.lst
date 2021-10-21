@@ -1,0 +1,262 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.1.12 #12697 (MINGW32)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module test
+                                      6 	.optsdcc -mpdk13
+                                      7 	
+                                      8 
+                                      9 ; default segment ordering in RAM for linker
+                                     10 	.area DATA
+                                     11 	.area OSEG (OVR,DATA)
+                                     12 
+                                     13 ;--------------------------------------------------------
+                                     14 ; Public variables in this module
+                                     15 ;--------------------------------------------------------
+                                     16 	.globl _main
+                                     17 	.globl __misc
+                                     18 	.globl __gpcs
+                                     19 	.globl __gpcc
+                                     20 	.globl __bgtr
+                                     21 	.globl __tm2b
+                                     22 	.globl __tm2s
+                                     23 	.globl __tm2ct
+                                     24 	.globl __tm2c
+                                     25 	.globl __t16c
+                                     26 	.globl __t16m
+                                     27 	.globl __paph
+                                     28 	.globl __pac
+                                     29 	.globl __pa
+                                     30 	.globl __padier
+                                     31 	.globl __integs
+                                     32 	.globl __intrq
+                                     33 	.globl __inten
+                                     34 	.globl __eoscr
+                                     35 	.globl __ilrcr
+                                     36 	.globl __ihrcr
+                                     37 	.globl __clkmd
+                                     38 	.globl __sp
+                                     39 	.globl __flag
+                                     40 	.globl _cnt
+                                     41 ;--------------------------------------------------------
+                                     42 ; special function registers
+                                     43 ;--------------------------------------------------------
+                                     44 	.area RSEG (ABS)
+      000000                         45 	.org 0x0000
+                           000000    46 __flag	=	0x0000
+                           000002    47 __sp	=	0x0002
+                           000003    48 __clkmd	=	0x0003
+                           00000B    49 __ihrcr	=	0x000b
+                           00001F    50 __ilrcr	=	0x001f
+                           00000A    51 __eoscr	=	0x000a
+                           000004    52 __inten	=	0x0004
+                           000005    53 __intrq	=	0x0005
+                           00000C    54 __integs	=	0x000c
+                           00000D    55 __padier	=	0x000d
+                           000010    56 __pa	=	0x0010
+                           000011    57 __pac	=	0x0011
+                           000012    58 __paph	=	0x0012
+                           000006    59 __t16m	=	0x0006
+      000000                         60 __t16c::
+      000000                         61 	.ds 2
+                           00001C    62 __tm2c	=	0x001c
+                           00001D    63 __tm2ct	=	0x001d
+                           000017    64 __tm2s	=	0x0017
+                           000009    65 __tm2b	=	0x0009
+                           000019    66 __bgtr	=	0x0019
+                           00001A    67 __gpcc	=	0x001a
+                           00001E    68 __gpcs	=	0x001e
+                           00001B    69 __misc	=	0x001b
+                                     70 ;--------------------------------------------------------
+                                     71 ; ram data
+                                     72 ;--------------------------------------------------------
+                                     73 	.area DATA
+      000000                         74 _cnt::
+      000000                         75 	.ds 2
+                                     76 ;--------------------------------------------------------
+                                     77 ; overlayable items in ram 
+                                     78 ;--------------------------------------------------------
+                                     79 	.area	OSEG (OVR,DATA)
+      000000                         80 _main_sloc0_1_0:
+      000000                         81 	.ds 2
+                                     82 ;--------------------------------------------------------
+                                     83 ; Stack segment in internal ram 
+                                     84 ;--------------------------------------------------------
+                                     85 	.area	SSEG
+      000000                         86 __start__stack:
+      000000                         87 	.ds	1
+                                     88 
+                                     89 ;--------------------------------------------------------
+                                     90 ; absolute external ram data
+                                     91 ;--------------------------------------------------------
+                                     92 	.area DABS (ABS)
+                                     93 ;--------------------------------------------------------
+                                     94 ; interrupt vector 
+                                     95 ;--------------------------------------------------------
+                                     96 	.area HOME
+      000000                         97 __interrupt_vect:
+                                     98 	.area	HEADER (ABS)
+      000020                         99 	.org	 0x0020
+      000020 3B 00                  100 	reti
+                                    101 ;--------------------------------------------------------
+                                    102 ; global & static initialisations
+                                    103 ;--------------------------------------------------------
+                                    104 	.area HOME
+                                    105 	.area GSINIT
+                                    106 	.area GSFINAL
+                                    107 	.area GSINIT
+                                    108 	.area	PREG (ABS)
+      000000                        109 	.org 0x00
+      000000                        110 p::
+      000000                        111 	.ds 2
+                                    112 	.area	HEADER (ABS)
+      000000                        113 	.org 0x0000
+      000000 00 00                  114 	nop
+      000002r81r09                  115 	clear	p+1
+      000004r00r17                  116 	mov	a, #s_OSEG
+      000006r01r10                  117 	add	a, #l_OSEG + 1
+      000008 FE 14                  118 	and	a, #0xfe
+      00000A 82 00                  119 	mov.io	sp, a
+      00000Cr00r1C                  120 	call	__sdcc_external_startup
+      00000Er00r18                  121 	goto	s_GSINIT
+                                    122 	.area GSINIT
+      000000                        123 __sdcc_init_data:
+      000000r00r17                  124 	mov	a, #s_DATA
+      000002rC0r05                  125 	mov	p, a
+      000004r0Er18                  126 	goto	00002$
+      000006                        127 00001$:
+      000006 00 17                  128 	mov	a, #0x00
+      000008rE0r00                  129 	idxm	p, a
+      00000Ar00r09                  130 	inc	p
+      00000Cr00r17                  131 	mov	a, #s_DATA
+      00000E                        132 00002$:
+      00000Er00r10                  133 	add	a, #l_DATA
+      000010r80r0B                  134 	ceqsn	a, p
+      000012r06r18                  135 	goto	00001$
+                                    136 	.area GSFINAL
+      000000r00r18                  137 	goto	__sdcc_program_startup
+                                    138 ;--------------------------------------------------------
+                                    139 ; Home
+                                    140 ;--------------------------------------------------------
+                                    141 	.area HOME
+                                    142 	.area HOME
+      000000                        143 __sdcc_program_startup:
+      000000r00r18                  144 	goto	_main
+                                    145 ;	return from main will return to caller
+                                    146 ;--------------------------------------------------------
+                                    147 ; code
+                                    148 ;--------------------------------------------------------
+                                    149 	.area CODE
+                                    150 ;	../tb/test.c: 14: void main() {
+                                    151 ; genLabel
+                                    152 ;	-----------------------------------------
+                                    153 ;	 function main
+                                    154 ;	-----------------------------------------
+                                    155 ;	Register assignment is optimal.
+      000000                        156 _main:
+                                    157 ; genLabel
+      000000                        158 00120$:
+                                    159 ;	../tb/test.c: 16: if get(PA,0) {
+                                    160 ; genAnd
+                                    161 ; peephole ( t0sn PA0 check )
+                                    162 ; peephole ( untwist conditional jumps t0sn -> t1sn )
+      000000 10 02                  163 	t1sn	__pa,#0
+      000002r08r18                  164 	goto	00102$
+                                    165 ; peephole ( jmp +1 )
+      000004                        166 00160$:
+                                    167 ; skipping generated iCode
+                                    168 ;	../tb/test.c: 17: set0(PA,0);
+                                    169 ; genAnd
+      000004 10 0E                  170 	set0.io	__pa, #0
+                                    171 ; genGoto
+      000006r0Ar18                  172 	goto	00104$
+                                    173 ; genLabel
+      000008                        174 00102$:
+                                    175 ;	../tb/test.c: 20: set1(PA,0);
+                                    176 ; genOr
+      000008 10 0F                  177 	set1.io	__pa, #0
+                                    178 ;	../tb/test.c: 22: while ( get(PA,1) ) {}
+                                    179 ; genLabel
+      00000A                        180 00104$:
+                                    181 ; genAnd
+                                    182 ; peephole ( t0sn PA1 check )
+      00000A 20 02                  183 	t0sn	__pa, #1
+      00000Cr0Ar18                  184 	goto	00104$
+                                    185 ; skipping generated iCode
+                                    186 ;	../tb/test.c: 23: while ( get(PA,2) ) cnt++;
+                                    187 ; genLabel
+      00000E                        188 00107$:
+                                    189 ; genAnd
+                                    190 ; peephole ( t0sn PA2 check )
+                                    191 ; peephole ( untwist conditional jumps t0sn -> t1sn )
+      00000E 50 02                  192 	t1sn	__pa,#2
+      000010r18r18                  193 	goto	00110$
+                                    194 ; peephole ( jmp +1 )
+      000012                        195 00161$:
+                                    196 ; skipping generated iCode
+                                    197 ; genPlus
+      000012r00r09                  198 	inc	_cnt+0
+      000014r01r08                  199 	addc	_cnt+1
+                                    200 ; genGoto
+      000016r0Er18                  201 	goto	00107$
+                                    202 ;	../tb/test.c: 24: do 
+                                    203 ; genLabel
+      000018                        204 00110$:
+                                    205 ;	../tb/test.c: 25: cnt++;
+                                    206 ; genPlus
+      000018r00r09                  207 	inc	_cnt+0
+      00001Ar01r08                  208 	addc	_cnt+1
+                                    209 ;	../tb/test.c: 26: while ( get(PA,3) );
+                                    210 ; genAnd
+                                    211 ; peephole ( t0sn PA3 check )
+      00001C 60 02                  212 	t0sn	__pa, #3
+      00001Er18r18                  213 	goto	00110$
+                                    214 ; skipping generated iCode
+                                    215 ;	../tb/test.c: 27: do 
+                                    216 ; genLabel
+      000020                        217 00113$:
+                                    218 ;	../tb/test.c: 28: cnt++;
+                                    219 ; genPlus
+      000020r00r09                  220 	inc	_cnt+0
+      000022r01r08                  221 	addc	_cnt+1
+                                    222 ;	../tb/test.c: 29: while ( !get(PA,3) );
+                                    223 ; genAnd
+                                    224 ; peephole ( t0sn PA3 check )
+                                    225 ; peephole ( untwist conditional jumps t0sn -> t1sn )
+      000024 70 02                  226 	t1sn	__pa,#3
+      000026r20r18                  227 	goto	00113$
+                                    228 ; peephole ( jmp +1 )
+      000028                        229 00162$:
+                                    230 ; skipping generated iCode
+                                    231 ;	../tb/test.c: 30: set(PA,4, (cnt>th) );
+                                    232 ; genAssign
+                                    233 ; genCmp
+                                    234 ; peephole ( const sub16 )
+      000028r00r1C                  235 	call	_th+0
+      00002Ar40r06                  236 	sub		a, _cnt+0
+      00002Cr02r1C                  237 	call	_th+1
+      00002ErC1r06                  238 	subc	a, _cnt+1
+      000030 20 0D                  239 	t1sn.io	f, c
+      000032r38r18                  240 	goto	00117$
+                                    241 ; skipping generated iCode
+                                    242 ; genOr
+      000034 90 0F                  243 	set1.io	__pa, #4
+                                    244 ; genGoto
+      000036r00r18                  245 	goto	00120$
+                                    246 ; genLabel
+      000038                        247 00117$:
+                                    248 ; genAnd
+      000038 90 0E                  249 	set0.io	__pa, #4
+                                    250 ; genGoto
+      00003Ar00r18                  251 	goto	00120$
+                                    252 ; genLabel
+                                    253 ; peephole j0 removed unused label 00122$.
+                                    254 ;	../tb/test.c: 32: }
+                                    255 ; genEndFunction
+      00003C 3A 00                  256 	ret
+                                    257 	.area CODE
+                                    258 	.area CONST
+      000000                        259 _th:
+      000000 34 01                  260 	ret #0x34
+      000002 12 01                  261 	ret #0x12	; 4660
+                                    262 	.area CABS (ABS)
