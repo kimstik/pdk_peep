@@ -9,7 +9,7 @@ def imsk(i):	return f'#0x{~(1<<i)&0xff:02x}'
 )$extend(msk,imsk)\
 
 //	----	conditional jumps	-----------------------------------------------
-$for(pair in [_.split() for _ in 't0sn t1sn,t1sn t0sn'.split(',')] ) $for(mem in ('','.io'))
+$for(pair in [('t0sn','t1sn'),('t1sn','t0sn')]) $for(mem in ('','.io'))
 replace restart {
 %1:
 	$(pair[0])$(mem)	%3,%4
@@ -36,7 +36,7 @@ replace restart {
 $endfor $endfor\
 
 //	----	bit movements	-----------------------------------------------
-$for(i in range(8)) $for(inst in 't0sn t1sn'.split() )
+$for(i in range(8)) $for(inst in ['t0sn','t1sn'] )
 replace restart {
 	$(inst).io	f, %4
 	goto	%2
@@ -70,27 +70,20 @@ replace restart {
 	and		a, $msk(i)
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait$(mem) 0 )
+} by {; peephole ( bit-wait$(mem) %2 $(i) )
 	t0sn$(mem)	%2, #$(i)
 	goto	%1
 } //if notUsed('a')
 $endfor $endfor\
 
-$for(i in range(8))
+$for(i in range(8)) $for(P in [('and','set0',imsk), ('or','set1',msk)])
 replace restart {
-	mov		a, $imsk(i)
-	and		%1, a
-} by {; peephole ( and -> set0 )
-	set0	%1, #$(i)
+	mov		a, $(P[2](i))
+	$(P[0])	%1, a
+} by {; peephole ( $(P[0]) -> $(P[1]) )
+	$(P[1])	%1, #$(i)
 }if notUsed('a')
-
-replace restart {
-	mov		a, $msk(i)
-	or		%1, a
-} by {; peephole ( or -> set1 )
-	set1	%1, #$(i)
-}if notUsed('a')
-$endfor\
+$endfor $endfor\
 
 //	----	misc	-----------------------------------------------------------
 replace restart {
