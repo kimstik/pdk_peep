@@ -1,6 +1,6 @@
                                       1 ;--------------------------------------------------------
                                       2 ; File Created by SDCC : free open source ANSI-C Compiler
-                                      3 ; Version 4.1.12 #12697 (MINGW32)
+                                      3 ; Version 4.2.0 #13081 (MINGW64)
                                       4 ;--------------------------------------------------------
                                       5 	.module test
                                       6 	.optsdcc -mpdk13
@@ -74,13 +74,13 @@
       000000                         74 _cnt::
       000000                         75 	.ds 2
                                      76 ;--------------------------------------------------------
-                                     77 ; overlayable items in ram 
+                                     77 ; overlayable items in ram
                                      78 ;--------------------------------------------------------
                                      79 	.area	OSEG (OVR,DATA)
       000000                         80 _main_sloc0_1_0:
       000000                         81 	.ds 2
                                      82 ;--------------------------------------------------------
-                                     83 ; Stack segment in internal ram 
+                                     83 ; Stack segment in internal ram
                                      84 ;--------------------------------------------------------
                                      85 	.area	SSEG
       000000                         86 __start__stack:
@@ -91,7 +91,7 @@
                                      91 ;--------------------------------------------------------
                                      92 	.area DABS (ABS)
                                      93 ;--------------------------------------------------------
-                                     94 ; interrupt vector 
+                                     94 ; interrupt vector
                                      95 ;--------------------------------------------------------
                                      96 	.area HOME
       000000                         97 __interrupt_vect:
@@ -158,7 +158,7 @@
       000000                        158 00120$:
                                     159 ;	../tb/test.c: 16: if get(PA,0) {
                                     160 ; genAnd
-                                    161 ; peephole ( bit-wait.io 0 )
+                                    161 ; peephole ( bit-wait.io __pa 0 ceqsn -> t0sn)
                                     162 ; peephole ( untwist conditional jumps forward t0sn -> t1sn )
       000000 10 0D                  163 	t1sn.io	__pa,#0
       000002r08r18                  164 	goto	00102$
@@ -179,7 +179,7 @@
                                     179 ; genLabel
       00000A                        180 00104$:
                                     181 ; genAnd
-                                    182 ; peephole ( bit-wait.io 0 )
+                                    182 ; peephole ( bit-wait.io __pa 1 ceqsn -> t0sn)
       00000A 30 0C                  183 	t0sn.io	__pa, #1
       00000Cr0Ar18                  184 	goto	00104$
                                     185 ; skipping generated iCode
@@ -187,7 +187,7 @@
                                     187 ; genLabel
       00000E                        188 00107$:
                                     189 ; genAnd
-                                    190 ; peephole ( bit-wait.io 0 )
+                                    190 ; peephole ( bit-wait.io __pa 2 ceqsn -> t0sn)
                                     191 ; peephole ( untwist conditional jumps forward t0sn -> t1sn )
       00000E 50 0D                  192 	t1sn.io	__pa,#2
       000010r18r18                  193 	goto	00110$
@@ -208,7 +208,7 @@
       00001Ar01r08                  208 	addc	_cnt+1
                                     209 ;	../tb/test.c: 26: while ( get(PA,3) );
                                     210 ; genAnd
-                                    211 ; peephole ( bit-wait.io 0 )
+                                    211 ; peephole ( bit-wait.io __pa 3 ceqsn -> t0sn)
       00001C 70 0C                  212 	t0sn.io	__pa, #3
       00001Er18r18                  213 	goto	00110$
                                     214 ; skipping generated iCode
@@ -221,7 +221,7 @@
       000022r01r08                  221 	addc	_cnt+1
                                     222 ;	../tb/test.c: 29: while ( !get(PA,3) );
                                     223 ; genAnd
-                                    224 ; peephole ( bit-wait.io 0 )
+                                    224 ; peephole ( bit-wait.io __pa 3 ceqsn -> t0sn)
                                     225 ; peephole ( untwist conditional jumps forward t0sn -> t1sn )
       000024 70 0D                  226 	t1sn.io	__pa,#3
       000026r20r18                  227 	goto	00113$

@@ -64,17 +64,17 @@ $py('''
 $endfor $endfor\
 
 //	----	bit ops	-----------------------------------------------------------
-$for(i in range(8))	$for(mem in ('','.io'))
+$for(i in range(8))	$for(mem in ('','.io')) $for(pair in [('cneqsn','t1sn'),('ceqsn','t0sn')])
 replace restart {
 	mov$(mem)	a, %2
 	and		a, $msk(i)
-	ceqsn	a, #0x00
+	$(pair[0])	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait$(mem) %2 $(i) )
-	t0sn$(mem)	%2, #$(i)
+} by {; peephole ( bit-wait$(mem) %2 $(i) $(pair[0]) -> $(pair[1]))
+	$(pair[1])$(mem)	%2, #$(i)
 	goto	%1
 } //if notUsed('a')
-$endfor $endfor\
+$endfor $endfor $endfor\
 
 $for(i in range(8)) $for(P in [('and','set0',imsk), ('or','set1',msk)])
 replace restart {

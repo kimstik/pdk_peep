@@ -437,154 +437,314 @@ replace restart {
 }
  
 //	----	bit ops	-----------------------------------------------------------
-	
+	 
+replace restart {
+	mov	a, %2
+	and		a, #0x01
+	cneqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait %2 0 cneqsn -> t1sn)
+	t1sn	%2, #0
+	goto	%1
+} //if notUsed('a')
+
 replace restart {
 	mov	a, %2
 	and		a, #0x01
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait %2 0 )
+} by {; peephole ( bit-wait %2 0 ceqsn -> t0sn)
 	t0sn	%2, #0
 	goto	%1
 } //if notUsed('a')
+  
+replace restart {
+	mov.io	a, %2
+	and		a, #0x01
+	cneqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait.io %2 0 cneqsn -> t1sn)
+	t1sn.io	%2, #0
+	goto	%1
+} //if notUsed('a')
 
 replace restart {
 	mov.io	a, %2
 	and		a, #0x01
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait.io %2 0 )
+} by {; peephole ( bit-wait.io %2 0 ceqsn -> t0sn)
 	t0sn.io	%2, #0
 	goto	%1
 } //if notUsed('a')
- 	
+  	 
+replace restart {
+	mov	a, %2
+	and		a, #0x02
+	cneqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait %2 1 cneqsn -> t1sn)
+	t1sn	%2, #1
+	goto	%1
+} //if notUsed('a')
+
 replace restart {
 	mov	a, %2
 	and		a, #0x02
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait %2 1 )
+} by {; peephole ( bit-wait %2 1 ceqsn -> t0sn)
 	t0sn	%2, #1
 	goto	%1
 } //if notUsed('a')
+  
+replace restart {
+	mov.io	a, %2
+	and		a, #0x02
+	cneqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait.io %2 1 cneqsn -> t1sn)
+	t1sn.io	%2, #1
+	goto	%1
+} //if notUsed('a')
 
 replace restart {
 	mov.io	a, %2
 	and		a, #0x02
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait.io %2 1 )
+} by {; peephole ( bit-wait.io %2 1 ceqsn -> t0sn)
 	t0sn.io	%2, #1
 	goto	%1
 } //if notUsed('a')
- 	
+  	 
+replace restart {
+	mov	a, %2
+	and		a, #0x04
+	cneqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait %2 2 cneqsn -> t1sn)
+	t1sn	%2, #2
+	goto	%1
+} //if notUsed('a')
+
 replace restart {
 	mov	a, %2
 	and		a, #0x04
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait %2 2 )
+} by {; peephole ( bit-wait %2 2 ceqsn -> t0sn)
 	t0sn	%2, #2
 	goto	%1
 } //if notUsed('a')
+  
+replace restart {
+	mov.io	a, %2
+	and		a, #0x04
+	cneqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait.io %2 2 cneqsn -> t1sn)
+	t1sn.io	%2, #2
+	goto	%1
+} //if notUsed('a')
 
 replace restart {
 	mov.io	a, %2
 	and		a, #0x04
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait.io %2 2 )
+} by {; peephole ( bit-wait.io %2 2 ceqsn -> t0sn)
 	t0sn.io	%2, #2
 	goto	%1
 } //if notUsed('a')
- 	
+  	 
+replace restart {
+	mov	a, %2
+	and		a, #0x08
+	cneqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait %2 3 cneqsn -> t1sn)
+	t1sn	%2, #3
+	goto	%1
+} //if notUsed('a')
+
 replace restart {
 	mov	a, %2
 	and		a, #0x08
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait %2 3 )
+} by {; peephole ( bit-wait %2 3 ceqsn -> t0sn)
 	t0sn	%2, #3
 	goto	%1
 } //if notUsed('a')
+  
+replace restart {
+	mov.io	a, %2
+	and		a, #0x08
+	cneqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait.io %2 3 cneqsn -> t1sn)
+	t1sn.io	%2, #3
+	goto	%1
+} //if notUsed('a')
 
 replace restart {
 	mov.io	a, %2
 	and		a, #0x08
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait.io %2 3 )
+} by {; peephole ( bit-wait.io %2 3 ceqsn -> t0sn)
 	t0sn.io	%2, #3
 	goto	%1
 } //if notUsed('a')
- 	
+  	 
+replace restart {
+	mov	a, %2
+	and		a, #0x10
+	cneqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait %2 4 cneqsn -> t1sn)
+	t1sn	%2, #4
+	goto	%1
+} //if notUsed('a')
+
 replace restart {
 	mov	a, %2
 	and		a, #0x10
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait %2 4 )
+} by {; peephole ( bit-wait %2 4 ceqsn -> t0sn)
 	t0sn	%2, #4
 	goto	%1
 } //if notUsed('a')
+  
+replace restart {
+	mov.io	a, %2
+	and		a, #0x10
+	cneqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait.io %2 4 cneqsn -> t1sn)
+	t1sn.io	%2, #4
+	goto	%1
+} //if notUsed('a')
 
 replace restart {
 	mov.io	a, %2
 	and		a, #0x10
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait.io %2 4 )
+} by {; peephole ( bit-wait.io %2 4 ceqsn -> t0sn)
 	t0sn.io	%2, #4
 	goto	%1
 } //if notUsed('a')
- 	
+  	 
+replace restart {
+	mov	a, %2
+	and		a, #0x20
+	cneqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait %2 5 cneqsn -> t1sn)
+	t1sn	%2, #5
+	goto	%1
+} //if notUsed('a')
+
 replace restart {
 	mov	a, %2
 	and		a, #0x20
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait %2 5 )
+} by {; peephole ( bit-wait %2 5 ceqsn -> t0sn)
 	t0sn	%2, #5
 	goto	%1
 } //if notUsed('a')
+  
+replace restart {
+	mov.io	a, %2
+	and		a, #0x20
+	cneqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait.io %2 5 cneqsn -> t1sn)
+	t1sn.io	%2, #5
+	goto	%1
+} //if notUsed('a')
 
 replace restart {
 	mov.io	a, %2
 	and		a, #0x20
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait.io %2 5 )
+} by {; peephole ( bit-wait.io %2 5 ceqsn -> t0sn)
 	t0sn.io	%2, #5
 	goto	%1
 } //if notUsed('a')
- 	
+  	 
+replace restart {
+	mov	a, %2
+	and		a, #0x40
+	cneqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait %2 6 cneqsn -> t1sn)
+	t1sn	%2, #6
+	goto	%1
+} //if notUsed('a')
+
 replace restart {
 	mov	a, %2
 	and		a, #0x40
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait %2 6 )
+} by {; peephole ( bit-wait %2 6 ceqsn -> t0sn)
 	t0sn	%2, #6
 	goto	%1
 } //if notUsed('a')
+  
+replace restart {
+	mov.io	a, %2
+	and		a, #0x40
+	cneqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait.io %2 6 cneqsn -> t1sn)
+	t1sn.io	%2, #6
+	goto	%1
+} //if notUsed('a')
 
 replace restart {
 	mov.io	a, %2
 	and		a, #0x40
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait.io %2 6 )
+} by {; peephole ( bit-wait.io %2 6 ceqsn -> t0sn)
 	t0sn.io	%2, #6
 	goto	%1
 } //if notUsed('a')
- 	
+  	 
+replace restart {
+	mov	a, %2
+	and		a, #0x80
+	cneqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait %2 7 cneqsn -> t1sn)
+	t1sn	%2, #7
+	goto	%1
+} //if notUsed('a')
+
 replace restart {
 	mov	a, %2
 	and		a, #0x80
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait %2 7 )
+} by {; peephole ( bit-wait %2 7 ceqsn -> t0sn)
 	t0sn	%2, #7
+	goto	%1
+} //if notUsed('a')
+  
+replace restart {
+	mov.io	a, %2
+	and		a, #0x80
+	cneqsn	a, #0x00
+	goto	%1
+} by {; peephole ( bit-wait.io %2 7 cneqsn -> t1sn)
+	t1sn.io	%2, #7
 	goto	%1
 } //if notUsed('a')
 
@@ -593,11 +753,11 @@ replace restart {
 	and		a, #0x80
 	ceqsn	a, #0x00
 	goto	%1
-} by {; peephole ( bit-wait.io %2 7 )
+} by {; peephole ( bit-wait.io %2 7 ceqsn -> t0sn)
 	t0sn.io	%2, #7
 	goto	%1
 } //if notUsed('a')
- 
+  
  
 replace restart {
 	mov		a, #0xfe

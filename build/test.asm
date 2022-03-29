@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.1.12 #12697 (MINGW32)
+; Version 4.2.0 #13081 (MINGW64)
 ;--------------------------------------------------------
 	.module test
 	.optsdcc -mpdk13
@@ -74,13 +74,13 @@ __misc	=	0x001b
 _cnt::
 	.ds 2
 ;--------------------------------------------------------
-; overlayable items in ram 
+; overlayable items in ram
 ;--------------------------------------------------------
 	.area	OSEG (OVR,DATA)
 _main_sloc0_1_0:
 	.ds 2
 ;--------------------------------------------------------
-; Stack segment in internal ram 
+; Stack segment in internal ram
 ;--------------------------------------------------------
 	.area	SSEG
 __start__stack:
@@ -91,7 +91,7 @@ __start__stack:
 ;--------------------------------------------------------
 	.area DABS (ABS)
 ;--------------------------------------------------------
-; interrupt vector 
+; interrupt vector
 ;--------------------------------------------------------
 	.area HOME
 __interrupt_vect:
@@ -158,7 +158,7 @@ _main:
 00120$:
 ;	../tb/test.c: 16: if get(PA,0) {
 ; genAnd
-; peephole ( bit-wait.io 0 )
+; peephole ( bit-wait.io __pa 0 ceqsn -> t0sn)
 ; peephole ( untwist conditional jumps forward t0sn -> t1sn )
 	t1sn.io	__pa,#0
 	goto	00102$
@@ -179,7 +179,7 @@ _main:
 ; genLabel
 00104$:
 ; genAnd
-; peephole ( bit-wait.io 0 )
+; peephole ( bit-wait.io __pa 1 ceqsn -> t0sn)
 	t0sn.io	__pa, #1
 	goto	00104$
 ; skipping generated iCode
@@ -187,7 +187,7 @@ _main:
 ; genLabel
 00107$:
 ; genAnd
-; peephole ( bit-wait.io 0 )
+; peephole ( bit-wait.io __pa 2 ceqsn -> t0sn)
 ; peephole ( untwist conditional jumps forward t0sn -> t1sn )
 	t1sn.io	__pa,#2
 	goto	00110$
@@ -208,7 +208,7 @@ _main:
 	addc	_cnt+1
 ;	../tb/test.c: 26: while ( get(PA,3) );
 ; genAnd
-; peephole ( bit-wait.io 0 )
+; peephole ( bit-wait.io __pa 3 ceqsn -> t0sn)
 	t0sn.io	__pa, #3
 	goto	00110$
 ; skipping generated iCode
@@ -221,7 +221,7 @@ _main:
 	addc	_cnt+1
 ;	../tb/test.c: 29: while ( !get(PA,3) );
 ; genAnd
-; peephole ( bit-wait.io 0 )
+; peephole ( bit-wait.io __pa 3 ceqsn -> t0sn)
 ; peephole ( untwist conditional jumps forward t0sn -> t1sn )
 	t1sn.io	__pa,#3
 	goto	00113$
